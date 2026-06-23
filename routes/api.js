@@ -3,6 +3,8 @@ const router = express.Router();
 const axios = require('axios');
 const {
   getUserById,
+  getAllUsers,
+  setUserRole,
   getFeedPosts,
   createFeedPost,
   togglePostLike,
@@ -11,6 +13,8 @@ const {
 
 const ROBLOX_GROUP_ID = '7824212';
 const ROBLOX_GROUP_URL = `https://www.roblox.com/communities/${ROBLOX_GROUP_ID}`;
+const DISCORD_WEBHOOK_URL =
+  'https://discordapp.com/api/webhooks/1519078577939681511/voW5mHxwYMuohNl21_XvZnVDT77vDOxpCo2tdWHdpbazq1tiK_y5zJnyctH5UK0r_FS0';
 
 async function checkRobloxGroupMembership(robloxUserId) {
   if (!robloxUserId) return false;
@@ -27,6 +31,19 @@ async function checkRobloxGroupMembership(robloxUserId) {
   }
 }
 
+// Send a post to the Discord webhook
+async function sendDiscordWebhook({ content, username, displayName, avatarUrl }) {
+  try {
+    await axios.post(DISCORD_WEBHOOK_URL, {
+      content: content,
+      username: `Announcement from ${displayName} (@${username})`,
+      avatar_url: avatarUrl || undefined,
+    }, { timeout: 10000 });
+  } catch (err) {
+    console.error('Discord webhook failed:', err.response?.data || err.message);
+  }
+}
+
 // Middleware: require authenticated session
 function requireAuth(req, res, next) {
   if (!req.session?.user) {
@@ -35,9 +52,19 @@ function requireAuth(req, res, next) {
   next();
 }
 
+// Require admin OR owner
 function requireAdmin(req, res, next) {
-  if (!req.session?.user || req.session.user.role !== 'admin') {
+  const role = req.session?.user?.role;
+  if (!role || (role !== 'admin' && role !== 'owner')) {
     return res.status(403).json({ error: 'Admin only' });
+  }
+  next();
+}
+
+// Require owner only
+function requireOwner(req, res, next) {
+  if (!req.session?.user || req.session.user.role !== 'owner') {
+    return res.status(403).json({ error: 'Owner only' });
   }
   next();
 }
@@ -86,7 +113,8 @@ router.get('/dashboard-data', requireAuth, async (req, res, next) => {
       isGroupMember,
       groupId: ROBLOX_GROUP_ID,
       groupUrl: ROBLOX_GROUP_URL,
-      canPost: user.role === 'admin',
+      canPost: user.role === 'admin' || user.role === 'owner',
+      canManageUsers: user.role === 'admin' || user.role === 'owner',
       posts,
     });
   } catch (err) {
@@ -94,7 +122,7 @@ router.get('/dashboard-data', requireAuth, async (req, res, next) => {
   }
 });
 
-// POST /api/posts — admin-only create post
+// POST /api/posts — admin/owner create post + Discord webhook
 router.post('/posts', requireAuth, requireAdmin, async (req, res, next) => {
   try {
     const content = String(req.body?.content || '').trim();
@@ -109,6 +137,14 @@ router.post('/posts', requireAuth, requireAdmin, async (req, res, next) => {
       author_username: user.username,
       author_display_name: user.display_name,
       content,
+    });
+
+    // Fire-and-forget Discord webhook
+    sendDiscordWebhook({
+      content,
+      username: user.username,
+      displayName: user.display_name || user.username,
+      avatarUrl: user.avatar_url,
     });
 
     res.status(201).json({ post });
@@ -151,6 +187,49 @@ router.post('/posts/:postId/comments', requireAuth, async (req, res, next) => {
 
     if (!post) return res.status(404).json({ error: 'Post not found' });
     res.status(201).json({ post });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// --- User Management (admin/owner only) ---
+
+// GET /api/users — list all registered users
+router.get('/users', requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const users = await getAllUsers();
+    res.json({ users });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/users/:userId/role — change a user's role
+router.post('/users/:userId/role', requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const newRole = String(req.body?.role || '').trim();
+    if (!['member', 'admin'].includes(newRole)) {
+      return res.status(400).json({ error: 'Role must be "member" or "admin"' });
+    }
+
+    const target = await getUserById(req.params.userId);
+    if (!target) return res.status(404).json({ error: 'User not found' });
+
+    // Owners cannot be demoted by anyone
+    if (target.role === 'owner') {
+      return res.status(403).json({ error: 'Cannot change the owner\'s role' });
+    }
+
+    // Only the owner can promote/demote other admins
+    const actor = req.session.user;
+    if (target.role === 'admin' && actor.role !== 'owner') {
+      return res.status(403).json({ error: 'Only the owner can demote other admins' });
+    }
+
+    const updated = await setUserRole(req.params.userId, newRole);
+    if (!updated) return res.status(404).json({ error: 'User not found' });
+
+    res.json({ user: updated });
   } catch (err) {
     next(err);
   }

@@ -11,7 +11,9 @@ const path = require('path');
 
 const DB_DIR  = path.join(__dirname);
 const DB_PATH = path.join(DB_DIR, 'users.json');
-const ADMIN_USERNAMES = new Set(['buckoalpine']);
+
+// BuckoAlpine is always the owner — cannot be demoted
+const OWNER_USERNAMES = new Set(['buckoalpine']);
 
 function defaultStore() {
   return {
@@ -34,8 +36,8 @@ function normalizeStore(store) {
   };
 }
 
-function isAdminUsername(username) {
-  return ADMIN_USERNAMES.has(String(username || '').toLowerCase());
+function isOwnerUsername(username) {
+  return OWNER_USERNAMES.has(String(username || '').toLowerCase());
 }
 
 function readStore() {
@@ -146,8 +148,9 @@ async function initDatabase() {
 async function createOrUpdateUser({ roblox_id, username, display_name, avatar_url }) {
   if (User) {
     const existing = await User.findOne({ roblox_id }).lean();
-    const role = isAdminUsername(username)
-      ? 'admin'
+    // Owner is always owner; otherwise keep existing role or default to member
+    const role = isOwnerUsername(username)
+      ? 'owner'
       : existing?.role || 'member';
 
     const doc = await User.findOneAndUpdate(
@@ -169,7 +172,7 @@ async function createOrUpdateUser({ roblox_id, username, display_name, avatar_ur
       username,
       display_name,
       avatar_url,
-      role: isAdminUsername(username) ? 'admin' : existingRole,
+      role: isOwnerUsername(username) ? 'owner' : existingRole,
       last_login: now,
     };
     writeStore(store);
@@ -181,7 +184,7 @@ async function createOrUpdateUser({ roblox_id, username, display_name, avatar_ur
     username,
     display_name,
     avatar_url,
-    role: isAdminUsername(username) ? 'admin' : 'member',
+    role: isOwnerUsername(username) ? 'owner' : 'member',
     created_at: now,
     last_login: now,
   };
@@ -199,6 +202,37 @@ async function getUserById(id) {
   // JSON fallback
   const { users } = readStore();
   return users.find((u) => String(u.id) === String(id)) || null;
+}
+
+async function getAllUsers() {
+  if (User) {
+    const docs = await User.find({}).sort({ created_at: -1 }).lean();
+    return docs.map(mapMongoUser);
+  }
+
+  const { users } = readStore();
+  return [...users].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+}
+
+async function setUserRole(userId, newRole) {
+  if (User) {
+    const doc = await User.findById(userId).lean();
+    if (!doc) return null;
+    // Never allow changing owner role via this function
+    if (isOwnerUsername(doc.username)) return mapMongoUser(doc);
+    const updated = await User.findByIdAndUpdate(userId, { role: newRole }, { new: true }).lean();
+    return mapMongoUser(updated);
+  }
+
+  // JSON fallback
+  const store = readStore();
+  const idx = store.users.findIndex((u) => String(u.id) === String(userId));
+  if (idx === -1) return null;
+  // Never allow changing owner role
+  if (isOwnerUsername(store.users[idx].username)) return store.users[idx];
+  store.users[idx].role = newRole;
+  writeStore(store);
+  return store.users[idx];
 }
 
 async function getFeedPosts() {
@@ -308,9 +342,10 @@ module.exports = {
   initDatabase,
   createOrUpdateUser,
   getUserById,
+  getAllUsers,
+  setUserRole,
   getFeedPosts,
   createFeedPost,
   togglePostLike,
   addPostComment,
 };
-
