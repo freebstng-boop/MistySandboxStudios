@@ -204,6 +204,17 @@ async function getUserById(id) {
   return users.find((u) => String(u.id) === String(id)) || null;
 }
 
+async function getUserByUsername(username) {
+  const lower = String(username || '').toLowerCase();
+  if (User) {
+    const doc = await User.findOne({ username: { $regex: new RegExp(`^${lower}$`, 'i') } }).lean();
+    return mapMongoUser(doc);
+  }
+
+  const { users } = readStore();
+  return users.find((u) => String(u.username || '').toLowerCase() === lower) || null;
+}
+
 async function getAllUsers() {
   if (User) {
     const docs = await User.find({}).sort({ created_at: -1 }).lean();
@@ -378,6 +389,7 @@ module.exports = {
   initDatabase,
   createOrUpdateUser,
   getUserById,
+  getUserByUsername,
   getAllUsers,
   setUserRole,
   getFeedPosts,

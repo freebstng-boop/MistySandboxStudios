@@ -3,6 +3,7 @@ const router = express.Router();
 const axios = require('axios');
 const {
   getUserById,
+  getUserByUsername,
   getAllUsers,
   setUserRole,
   getFeedPosts,
@@ -77,6 +78,28 @@ router.get('/auth/status', (req, res) => {
     authenticated: !!req.session.user,
     user: req.session.user || null,
   });
+});
+
+// GET /api/profile/:username — public profile data
+router.get('/profile/:username', async (req, res, next) => {
+  try {
+    const user = await getUserByUsername(req.params.username);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Return only public-safe fields
+    res.json({
+      user: {
+        username: user.username,
+        display_name: user.display_name,
+        avatar_url: user.avatar_url,
+        role: user.role,
+        created_at: user.created_at,
+        roblox_id: user.roblox_id,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // GET /api/user — return full profile of the logged-in user

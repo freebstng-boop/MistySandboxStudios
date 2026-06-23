@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard — Misty Sandbox Studios</title>
+  <link rel="icon" type="image/png" href="/cdn/MistySandboxStudiosLOGO.png" />
   <meta name="robots" content="noindex" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -125,6 +126,7 @@
         <div class="profile-username" id="profile-username">@loading</div>
         <div style="margin:12px 0"><span class="role-badge" id="profile-role">member</span></div>
         <div class="profile-meta" id="profile-meta">Joined: —<br>Last seen: —<br>Group: <span id="group-status-label">Checking...</span></div>
+        <a href="#" class="btn btn-outline" id="view-profile-btn" style="margin:12px 0;display:inline-block;font-size:0.84rem">View Public Profile</a>
         <button class="logout-btn" id="logout-btn" aria-label="Log out">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Log Out
@@ -245,6 +247,7 @@
       const lastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Unknown';
       document.getElementById('profile-meta').innerHTML = `Joined: ${created}<br>Last seen: ${lastLogin}<br>Group: <span id="group-status-label">${isGroupMember ? 'Member' : 'Not Joined'}</span>`;
       if (isGroupMember) document.getElementById('welcome-verified').style.display = 'inline-flex';
+      document.getElementById('view-profile-btn').href = `/profile/${encodeURIComponent(user.username)}`;
     }
 
     async function loadDashboard() {

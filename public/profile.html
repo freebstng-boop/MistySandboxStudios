@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile — Misty Sandbox Studios</title>
+  <link rel="icon" type="image/png" href="/cdn/MistySandboxStudiosLOGO.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .profile-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 40px 20px; }
+    .profile-container { width: 100%; max-width: 480px; }
+    .profile-card-main { background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 36px; text-align: center; }
+    .profile-avatar-large { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; overflow: hidden; border: 3px solid var(--border); background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--text-muted); }
+    .profile-avatar-large img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-display-name { font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+    .profile-handle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px; }
+    .profile-role-badge { display: inline-block; padding: 4px 14px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 20px; }
+    .role-owner-badge { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .role-admin-badge { background: rgba(34, 211, 238, 0.1); color: #22d3ee; border: 1px solid rgba(34, 211, 238, 0.3); }
+    .role-member-badge { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
+    .profile-info { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; text-align: left; border-top: 1px solid var(--border-subtle); padding-top: 20px; }
+    .profile-info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; }
+    .profile-info-label { color: var(--text-dim); }
+    .profile-info-value { color: var(--text); font-weight: 500; }
+    .profile-links { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .profile-links a { flex: 1; min-width: 140px; }
+    .profile-share { margin-top: 16px; display: flex; align-items: center; gap: 8px; justify-content: center; }
+    .profile-share input { flex: 1; min-width: 0; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: rgba(255, 255, 255, 0.03); color: var(--text); padding: 8px 10px; font-family: inherit; font-size: 0.84rem; }
+    .profile-share button { white-space: nowrap; }
+    .profile-not-found { text-align: center; color: var(--text-muted); }
+    .profile-not-found h2 { font-family: 'Orbitron', monospace; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <canvas id="mist-canvas" aria-hidden="true"></canvas>
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo" aria-label="Misty Sandbox Studios Home">
+        <div class="logo-icon" style="background:transparent;box-shadow:none;overflow:hidden;padding:0">
+          <img src="/cdn/MistySandboxStudiosLOGO.png" alt="" aria-hidden="true" style="width:100%;height:100%;object-fit:contain" />
+        </div>
+        <span>Misty Sandbox Studios</span>
+      </a>
+      <div class="nav-actions">
+        <a href="/login" class="btn btn-primary">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="profile-page" role="main">
+    <div class="profile-container" id="profile-container">
+      <div style="text-align:center;color:var(--text-muted)">Loading profile...</div>
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script>
+    (async function () {
+      const container = document.getElementById('profile-container');
+      const pathParts = window.location.pathname.split('/');
+      const username = decodeURIComponent(pathParts[pathParts.length - 1] || '');
+
+      if (!username) {
+        container.innerHTML = '<div class="profile-not-found"><h2>Not Found</h2><p>No username specified.</p><a href="/" class="btn btn-outline">Back to Home</a></div>';
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/profile/${encodeURIComponent(username)}`);
+        if (!res.ok) {
+          container.innerHTML = '<div class="profile-not-found"><h2>User Not Found</h2><p>This profile does not exist.</p><a href="/" class="btn btn-outline">Back to Home</a></div>';
+          return;
+        }
+
+        const data = await res.json();
+        const user = data.user;
+        document.title = `${user.display_name || user.username} — Misty Sandbox Studios`;
+
+        const roleBadgeClass = user.role === 'owner' ? 'role-owner-badge' : user.role === 'admin' ? 'role-admin-badge' : 'role-member-badge';
+        const roleLabel = user.role === 'owner' ? 'Owner' : user.role === 'admin' ? 'Admin' : 'Member';
+        const joined = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown';
+        const profileUrl = window.location.href;
+        const robloxProfileUrl = user.roblox_id ? `https://www.roblox.com/users/${user.roblox_id}/profile` : null;
+
+        let avatarHtml;
+        if (user.avatar_url) {
+          avatarHtml = `<img src="${escapeHtml(user.avatar_url)}" alt="${escapeHtml(user.display_name || user.username)}" />`;
+        } else {
+          avatarHtml = (user.display_name || user.username).charAt(0).toUpperCase();
+        }
+
+        container.innerHTML = `
+          <div class="profile-card-main">
+            <div class="profile-avatar-large">${avatarHtml}</div>
+            <div class="profile-display-name">${escapeHtml(user.display_name || user.username)}</div>
+            <div class="profile-handle">@${escapeHtml(user.username)}</div>
+            <div class="profile-role-badge ${roleBadgeClass}">${roleLabel}</div>
+
+            <div class="profile-info">
+              <div class="profile-info-row">
+                <span class="profile-info-label">Joined</span>
+                <span class="profile-info-value">${joined}</span>
+              </div>
+              <div class="profile-info-row">
+                <span class="profile-info-label">Role</span>
+                <span class="profile-info-value">${roleLabel}</span>
+              </div>
+            </div>
+
+            <div class="profile-links">
+              ${robloxProfileUrl ? `<a href="${robloxProfileUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Roblox Profile</a>` : ''}
+              <a href="/" class="btn btn-outline">Back to Home</a>
+            </div>
+
+            <div class="profile-share">
+              <input type="text" id="share-url" value="${escapeHtml(profileUrl)}" readonly />
+              <button class="btn btn-primary" id="copy-btn" type="button">Copy</button>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('copy-btn').addEventListener('click', () => {
+          const input = document.getElementById('share-url');
+          navigator.clipboard.writeText(input.value).then(() => {
+            document.getElementById('copy-btn').textContent = 'Copied!';
+            setTimeout(() => { document.getElementById('copy-btn').textContent = 'Copy'; }, 2000);
+          });
+        });
+      } catch (err) {
+        console.error('Profile load error:', err);
+        container.innerHTML = '<div class="profile-not-found"><h2>Error</h2><p>Could not load profile.</p><a href="/" class="btn btn-outline">Back to Home</a></div>';
+      }
+    })();
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+  </script>
+</body>
+</html>
