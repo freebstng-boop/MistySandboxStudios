@@ -90,24 +90,28 @@ router.get('/roblox/callback', async (req, res) => {
 
   try {
     // Exchange authorization code for access token
-    // Roblox requires client credentials via HTTP Basic Auth header
-    const credentials = Buffer.from(
-      `${process.env.ROBLOX_CLIENT_ID}:${process.env.ROBLOX_CLIENT_SECRET}`
-    ).toString('base64');
+    const clientId = (process.env.ROBLOX_CLIENT_ID || '').trim();
+    const clientSecret = (process.env.ROBLOX_CLIENT_SECRET || '').trim();
+
+    if (!clientSecret) {
+      console.error('ROBLOX_CLIENT_SECRET is missing or empty');
+      return res.redirect('/login?error=not_configured');
+    }
+
+    console.log(`OAuth token exchange — client_id length: ${clientId.length}, secret length: ${clientSecret.length}, redirect: ${redirectUri}`);
 
     const tokenResponse = await axios.post(
       ROBLOX_TOKEN_URL,
       new URLSearchParams({
         grant_type: 'authorization_code',
         code: code,
+        client_id: clientId,
+        client_secret: clientSecret,
         redirect_uri: redirectUri,
         code_verifier: codeVerifier,
       }).toString(),
       {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${credentials}`,
-        },
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         timeout: 10000,
       }
     );
