@@ -9,11 +9,51 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .group-popup-backdrop { position: fixed; inset: 0; z-index: 120; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 24px; }
+    .group-popup { width: 100%; max-width: 520px; background: rgba(10, 10, 30, 0.95); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; box-shadow: 0 30px 90px rgba(0, 0, 0, 0.5); }
+    .group-popup h2 { font-family: 'Orbitron', monospace; margin-bottom: 10px; font-size: 1.35rem; }
+    .group-popup p { color: var(--text-muted); margin-bottom: 20px; line-height: 1.7; }
+    .group-popup .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .verified-badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-left: 8px; border-radius: 50%; background: linear-gradient(135deg, #22d3ee, #0ea5e9); color: #fff; font-size: 12px; box-shadow: 0 0 12px rgba(14, 165, 233, 0.35); vertical-align: middle; }
+    .social-feed h3 { display: flex; align-items: center; justify-content: space-between; }
+    .composer { margin-bottom: 20px; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px; background: rgba(255, 255, 255, 0.02); }
+    .composer textarea { width: 100%; resize: vertical; min-height: 96px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); color: var(--text); padding: 10px 12px; font-family: inherit; margin-bottom: 10px; }
+    .composer-footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .composer-note { font-size: 0.8rem; color: var(--text-dim); }
+    .feed-list { display: flex; flex-direction: column; gap: 14px; }
+    .feed-card { border: 1px solid var(--border-subtle); background: rgba(255, 255, 255, 0.02); border-radius: var(--radius-md); padding: 14px; }
+    .feed-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+    .feed-author { font-weight: 700; display: inline-flex; align-items: center; gap: 6px; }
+    .feed-date { color: var(--text-dim); font-size: 0.8rem; }
+    .feed-content { color: var(--text); line-height: 1.7; white-space: pre-wrap; margin-bottom: 12px; font-size: 0.93rem; }
+    .feed-actions { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .feed-btn { border: 1px solid var(--border-subtle); background: transparent; color: var(--text-muted); border-radius: 999px; padding: 6px 12px; font-size: 0.82rem; cursor: pointer; transition: all var(--transition); }
+    .feed-btn:hover { border-color: var(--border); color: var(--text); }
+    .feed-btn.active { color: #22d3ee; border-color: rgba(34, 211, 238, 0.4); background: rgba(34, 211, 238, 0.08); }
+    .comment-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+    .comment-item { border-left: 2px solid var(--border-subtle); padding-left: 10px; }
+    .comment-item .meta { color: var(--text-dim); font-size: 0.76rem; }
+    .comment-item .text { font-size: 0.86rem; color: var(--text-muted); white-space: pre-wrap; }
+    .comment-form { display: flex; gap: 8px; margin-top: 8px; }
+    .comment-form input { flex: 1; min-width: 0; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); background: rgba(255, 255, 255, 0.03); color: var(--text); padding: 8px 10px; font-family: inherit; font-size: 0.84rem; }
+    .empty-feed { color: var(--text-muted); text-align: center; padding: 28px 12px; border: 1px dashed var(--border-subtle); border-radius: var(--radius-md); }
+  </style>
 </head>
 <body class="dashboard-page">
   <canvas id="mist-canvas" aria-hidden="true"></canvas>
 
-  <!-- ── Dashboard Nav ── -->
+  <div class="group-popup-backdrop" id="group-popup-backdrop" aria-hidden="true">
+    <div class="group-popup" role="dialog" aria-modal="true" aria-labelledby="group-popup-title">
+      <h2 id="group-popup-title">Join The Studio Group</h2>
+      <p>You are not in the official Misty Sandbox Studios Roblox group yet. Join to unlock full community perks.</p>
+      <div class="actions">
+        <a id="group-join-link" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Join Group</a>
+        <button class="btn btn-outline" id="group-popup-close" type="button">Maybe later</button>
+      </div>
+    </div>
+  </div>
+
   <nav class="dashboard-nav" role="navigation" aria-label="Dashboard navigation">
     <div class="nav-container">
       <a href="/" class="nav-logo" aria-label="Home">
@@ -22,8 +62,6 @@
         </div>
         <span>Misty Sandbox Studios</span>
       </a>
-
-      <!-- User pill — populated by JS -->
       <div class="user-pill" id="user-pill" aria-label="Your profile">
         <div class="user-avatar" id="nav-avatar" aria-hidden="true">?</div>
         <span class="user-name" id="nav-username">Loading…</span>
@@ -31,110 +69,49 @@
     </div>
   </nav>
 
-  <!-- ── Main Content ── -->
   <main class="dash-main" id="dash-content" role="main">
-
-    <!-- Welcome -->
     <div class="dash-welcome">
-      <h1>Welcome back, <span id="welcome-name" class="gradient-text">Explorer</span> 👋</h1>
-      <p>Here's what's happening at Misty Sandbox Studios.</p>
+      <h1>
+        Welcome back, <span id="welcome-name" class="gradient-text">Explorer</span>
+        <span id="welcome-verified" class="verified-badge" style="display:none" title="Verified Group Member">✓</span>
+      </h1>
+      <p>Here is your studio dashboard and admin social feed.</p>
     </div>
 
-    <!-- Stats row -->
     <div class="dash-stats" role="list">
-      <div class="stat-card" role="listitem">
-        <div class="stat-icon purple">🎮</div>
-        <div class="stat-number">3</div>
-        <div class="stat-label">Active Games</div>
-      </div>
-      <div class="stat-card" role="listitem">
-        <div class="stat-icon cyan">👥</div>
-        <div class="stat-number">50K+</div>
-        <div class="stat-label">Community Members</div>
-      </div>
-      <div class="stat-card" role="listitem">
-        <div class="stat-icon green">🟢</div>
-        <div class="stat-number">2</div>
-        <div class="stat-label">Live Servers</div>
-      </div>
-      <div class="stat-card" role="listitem">
-        <div class="stat-icon amber">📣</div>
-        <div class="stat-number">3</div>
-        <div class="stat-label">News Updates</div>
-      </div>
+      <div class="stat-card" role="listitem"><div class="stat-icon purple">🎮</div><div class="stat-number">1</div><div class="stat-label">Published Game</div></div>
+      <div class="stat-card" role="listitem"><div class="stat-icon cyan">🏢</div><div class="stat-number">7824212</div><div class="stat-label">Studio Group ID</div></div>
+      <div class="stat-card" role="listitem"><div class="stat-icon green">📡</div><div class="stat-number" id="post-count">0</div><div class="stat-label">Admin Posts</div></div>
+      <div class="stat-card" role="listitem"><div class="stat-icon amber">💬</div><div class="stat-number" id="comment-count">0</div><div class="stat-label">Comments</div></div>
     </div>
 
-    <!-- Main panels -->
     <div class="dash-grid">
-
-      <!-- News feed -->
-      <div class="dash-panel" role="feed" aria-label="Studio news">
+      <div class="dash-panel social-feed" role="feed" aria-label="Admin social feed">
         <h3>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z" stroke="var(--purple-light)" stroke-width="2" stroke-linejoin="round"/>
-            <path d="M9 14h6M9 10h4" stroke="var(--purple-light)" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          Studio News
+          <span>Admin Feed</span>
+          <span class="role-badge" id="posting-badge" style="display:none">Admin Posting Enabled</span>
         </h3>
 
-        <article class="news-item">
-          <div class="news-icon">🚀</div>
-          <div class="news-content">
-            <h4>Project: Veil — First Screenshots Revealed</h4>
-            <p>Get your first look at our upcoming action RPG. The atmosphere is unlike anything we've built before.</p>
-            <div class="news-date">June 20, 2026</div>
+        <div class="composer" id="post-composer" style="display:none">
+          <textarea id="post-content" placeholder="Share an update for your community..."></textarea>
+          <div class="composer-footer">
+            <span class="composer-note">Posts are visible to all members.</span>
+            <button class="btn btn-primary" id="post-submit" type="button">Publish Post</button>
           </div>
-        </article>
-
-        <article class="news-item">
-          <div class="news-icon">🔧</div>
-          <div class="news-content">
-            <h4>Misty Hollow v2.4 Update</h4>
-            <p>New fog mechanics, a revamped inn district, and over 30 bug fixes are live now. Check the patch notes!</p>
-            <div class="news-date">June 14, 2026</div>
-          </div>
-        </article>
-
-        <article class="news-item">
-          <div class="news-icon">🎉</div>
-          <div class="news-content">
-            <h4>50,000 Players Milestone!</h4>
-            <p>We hit 50K total visits across all our games. Thank you to every single player — this is for you.</p>
-            <div class="news-date">June 5, 2026</div>
-          </div>
-        </article>
-      </div>
-
-      <!-- Profile panel -->
-      <div class="dash-panel profile-card" role="region" aria-label="Your profile">
-        <h3 style="justify-content:center">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <circle cx="12" cy="8" r="4" stroke="var(--purple-light)" stroke-width="2"/>
-            <path d="M6 20v-1a6 6 0 0112 0v1" stroke="var(--purple-light)" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          Your Profile
-        </h3>
-
-        <div class="profile-avatar-wrap" id="profile-avatar-wrap" aria-hidden="true">
-          <span id="profile-avatar-initials">?</span>
         </div>
 
+        <div class="feed-list" id="feed-list"></div>
+      </div>
+
+      <div class="dash-panel profile-card" role="region" aria-label="Your profile">
+        <h3 style="justify-content:center">Your Profile</h3>
+        <div class="profile-avatar-wrap" id="profile-avatar-wrap" aria-hidden="true"><span id="profile-avatar-initials">?</span></div>
         <div class="profile-name" id="profile-display-name">Loading…</div>
         <div class="profile-username" id="profile-username">@loading</div>
-
-        <div style="margin:12px 0">
-          <span class="role-badge" id="profile-role">member</span>
-        </div>
-
-        <div class="profile-meta" id="profile-meta">
-          Joined: —<br>
-          Last seen: —
-        </div>
-
+        <div style="margin:12px 0"><span class="role-badge" id="profile-role">member</span></div>
+        <div class="profile-meta" id="profile-meta">Joined: —<br>Last seen: —<br>Group: <span id="group-status-label">Checking...</span></div>
         <button class="logout-btn" id="logout-btn" aria-label="Log out">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Log Out
         </button>
       </div>
@@ -143,71 +120,192 @@
 
   <script src="/js/app.js"></script>
   <script>
-    // Load user info and populate dashboard
-    (async function () {
+    const feedList = document.getElementById('feed-list');
+    const postComposer = document.getElementById('post-composer');
+    const postSubmit = document.getElementById('post-submit');
+    const postContent = document.getElementById('post-content');
+    const postingBadge = document.getElementById('posting-badge');
+    const groupPopupBackdrop = document.getElementById('group-popup-backdrop');
+    const groupPopupClose = document.getElementById('group-popup-close');
+    const groupJoinLink = document.getElementById('group-join-link');
+
+    let currentUser = null;
+    let feedPosts = [];
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function formatDate(value) { return value ? new Date(value).toLocaleString() : 'Unknown'; }
+
+    function renderFeed() {
+      if (!Array.isArray(feedPosts) || feedPosts.length === 0) {
+        feedList.innerHTML = '<div class="empty-feed">No admin posts yet.</div>';
+        document.getElementById('post-count').textContent = '0';
+        document.getElementById('comment-count').textContent = '0';
+        return;
+      }
+
+      let totalComments = 0;
+      for (const post of feedPosts) totalComments += Array.isArray(post.comments) ? post.comments.length : 0;
+      document.getElementById('post-count').textContent = String(feedPosts.length);
+      document.getElementById('comment-count').textContent = String(totalComments);
+
+      feedList.innerHTML = feedPosts.map((post) => {
+        const likes = Array.isArray(post.likes) ? post.likes : [];
+        const comments = Array.isArray(post.comments) ? post.comments : [];
+        const liked = likes.includes(String(currentUser.id));
+        const commentHtml = comments.map((comment) => `
+          <div class="comment-item">
+            <div class="meta">${escapeHtml(comment.display_name || comment.username)} · ${escapeHtml(formatDate(comment.created_at))}</div>
+            <div class="text">${escapeHtml(comment.text)}</div>
+          </div>
+        `).join('');
+
+        return `
+          <article class="feed-card" data-post-id="${escapeHtml(post.id)}">
+            <div class="feed-head">
+              <div class="feed-author">${escapeHtml(post.author_display_name || post.author_username)}<span class="verified-badge" title="Admin">✓</span></div>
+              <div class="feed-date">${escapeHtml(formatDate(post.created_at))}</div>
+            </div>
+            <div class="feed-content">${escapeHtml(post.content)}</div>
+            <div class="feed-actions">
+              <button class="feed-btn ${liked ? 'active' : ''}" data-action="like" data-post-id="${escapeHtml(post.id)}">${liked ? 'Unlike' : 'Like'} (${likes.length})</button>
+              <span class="composer-note">${comments.length} comment(s)</span>
+            </div>
+            <div class="comment-list">${commentHtml}</div>
+            <form class="comment-form" data-action="comment" data-post-id="${escapeHtml(post.id)}">
+              <input type="text" name="commentText" maxlength="500" placeholder="Write a comment..." required />
+              <button class="btn btn-outline" type="submit">Send</button>
+            </form>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function populateProfile(user, isGroupMember) {
+      document.getElementById('nav-username').textContent = user.display_name || user.username;
+      const navAvatar = document.getElementById('nav-avatar');
+      if (user.avatar_url) {
+        const img = document.createElement('img'); img.src = user.avatar_url; img.alt = user.display_name || user.username; navAvatar.textContent = ''; navAvatar.appendChild(img);
+      } else {
+        navAvatar.textContent = (user.display_name || user.username).charAt(0).toUpperCase();
+      }
+
+      document.getElementById('welcome-name').textContent = user.display_name || user.username;
+      document.title = `Dashboard — ${user.display_name || user.username} | Misty Sandbox Studios`;
+      document.getElementById('profile-display-name').textContent = user.display_name || user.username;
+      document.getElementById('profile-username').textContent = '@' + user.username;
+      document.getElementById('profile-role').textContent = user.role || 'member';
+
+      const avatarWrap = document.getElementById('profile-avatar-wrap');
+      const initials = document.getElementById('profile-avatar-initials');
+      if (user.avatar_url) {
+        const img = document.createElement('img'); img.src = user.avatar_url; img.alt = user.display_name || user.username; initials.replaceWith(img);
+      } else {
+        initials.textContent = (user.display_name || user.username).charAt(0).toUpperCase();
+      }
+
+      const created = user.created_at ? new Date(user.created_at).toLocaleDateString() : 'Unknown';
+      const lastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Unknown';
+      document.getElementById('profile-meta').innerHTML = `Joined: ${created}<br>Last seen: ${lastLogin}<br>Group: <span id="group-status-label">${isGroupMember ? 'Member' : 'Not Joined'}</span>`;
+      if (isGroupMember) document.getElementById('welcome-verified').style.display = 'inline-flex';
+    }
+
+    async function loadDashboard() {
       try {
-        const res  = await fetch('/api/user', { credentials: 'same-origin' });
-        if (!res.ok) {
-          window.location.href = '/login';
-          return;
-        }
-        const { user } = await res.json();
+        const res = await fetch('/api/dashboard-data', { credentials: 'same-origin' });
+        if (!res.ok) { window.location.href = '/login'; return; }
 
-        // Nav
-        document.getElementById('nav-username').textContent = user.display_name || user.username;
-        const navAvatar = document.getElementById('nav-avatar');
-        if (user.avatar_url) {
-          const img = document.createElement('img');
-          img.src = user.avatar_url;
-          img.alt = user.display_name || user.username;
-          navAvatar.textContent = '';
-          navAvatar.appendChild(img);
-        } else {
-          navAvatar.textContent = (user.display_name || user.username).charAt(0).toUpperCase();
-        }
+        const data = await res.json();
+        currentUser = data.user;
+        feedPosts = Array.isArray(data.posts) ? data.posts : [];
+        populateProfile(data.user, data.isGroupMember);
+        renderFeed();
 
-        // Welcome
-        document.getElementById('welcome-name').textContent = user.display_name || user.username;
-        document.title = `Dashboard — ${user.display_name || user.username} | Misty Sandbox Studios`;
-
-        // Profile card
-        document.getElementById('profile-display-name').textContent = user.display_name || user.username;
-        document.getElementById('profile-username').textContent      = '@' + user.username;
-        document.getElementById('profile-role').textContent          = user.role || 'member';
-
-        const avatarWrap = document.getElementById('profile-avatar-wrap');
-        const initials   = document.getElementById('profile-avatar-initials');
-        if (user.avatar_url) {
-          const img = document.createElement('img');
-          img.src = user.avatar_url;
-          img.alt = user.display_name || user.username;
-          initials.replaceWith(img);
-        } else {
-          initials.textContent = (user.display_name || user.username).charAt(0).toUpperCase();
-        }
-
-        // Dates
-        const created   = user.created_at   ? new Date(user.created_at).toLocaleDateString()   : 'Unknown';
-        const lastLogin = user.last_login    ? new Date(user.last_login).toLocaleDateString()   : 'Unknown';
-        document.getElementById('profile-meta').innerHTML =
-          `Joined: ${created}<br>Last seen: ${lastLogin}`;
-
-      } catch (e) {
-        console.error('Dashboard load error:', e);
+        if (data.canPost) { postComposer.style.display = 'block'; postingBadge.style.display = 'inline-flex'; }
+        groupJoinLink.href = data.groupUrl || 'https://www.roblox.com/communities/7824212';
+        if (!data.isGroupMember) { groupPopupBackdrop.style.display = 'flex'; groupPopupBackdrop.setAttribute('aria-hidden', 'false'); }
+      } catch (error) {
+        console.error('Dashboard load error:', error);
         window.location.href = '/login';
       }
-    })();
+    }
 
-    // Logout
+    postSubmit.addEventListener('click', async () => {
+      const content = postContent.value.trim();
+      if (!content) return;
+      postSubmit.disabled = true;
+      try {
+        const res = await fetch('/api/posts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ content }) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Could not create post');
+        postContent.value = '';
+        feedPosts = [data.post, ...feedPosts];
+        renderFeed();
+      } catch (err) {
+        alert(err.message || 'Post failed');
+      } finally {
+        postSubmit.disabled = false;
+      }
+    });
+
+    feedList.addEventListener('click', async (event) => {
+      const likeButton = event.target.closest('[data-action="like"]');
+      if (!likeButton) return;
+      const postId = likeButton.getAttribute('data-post-id');
+      if (!postId) return;
+      likeButton.disabled = true;
+      try {
+        const res = await fetch(`/api/posts/${postId}/like`, { method: 'POST', credentials: 'same-origin' });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Like failed');
+        feedPosts = feedPosts.map((post) => (String(post.id) === String(postId) ? data.post : post));
+        renderFeed();
+      } catch (err) {
+        alert(err.message || 'Like failed');
+      } finally {
+        likeButton.disabled = false;
+      }
+    });
+
+    feedList.addEventListener('submit', async (event) => {
+      const form = event.target.closest('form[data-action="comment"]');
+      if (!form) return;
+      event.preventDefault();
+      const postId = form.getAttribute('data-post-id');
+      const input = form.querySelector('input[name="commentText"]');
+      const text = String(input.value || '').trim();
+      if (!text) return;
+
+      const submitButton = form.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      try {
+        const res = await fetch(`/api/posts/${postId}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ text }) });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Comment failed');
+        input.value = '';
+        feedPosts = feedPosts.map((post) => (String(post.id) === String(postId) ? data.post : post));
+        renderFeed();
+      } catch (err) {
+        alert(err.message || 'Comment failed');
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+
+    groupPopupClose.addEventListener('click', () => {
+      groupPopupBackdrop.style.display = 'none';
+      groupPopupBackdrop.setAttribute('aria-hidden', 'true');
+    });
+
     document.getElementById('logout-btn').addEventListener('click', async function () {
       this.disabled = true;
       this.textContent = 'Logging out…';
-      try {
-        await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
-      } finally {
-        window.location.href = '/';
-      }
+      try { await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' }); }
+      finally { window.location.href = '/'; }
     });
+
+    loadDashboard();
   </script>
 </body>
 </html>
