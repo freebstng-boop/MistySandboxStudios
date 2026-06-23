@@ -183,9 +183,13 @@
         const likes = Array.isArray(post.likes) ? post.likes : [];
         const comments = Array.isArray(post.comments) ? post.comments : [];
         const liked = likes.includes(String(currentUser.id));
+        const isAdmin = currentUser.role === 'admin' || currentUser.role === 'owner';
         const commentHtml = comments.map((comment) => `
           <div class="comment-item">
-            <div class="meta">${escapeHtml(comment.display_name || comment.username)} · ${escapeHtml(formatDate(comment.created_at))}</div>
+            <div class="meta">
+              ${escapeHtml(comment.display_name || comment.username)} · ${escapeHtml(formatDate(comment.created_at))}
+              ${isAdmin ? `<button class="btn-sm demote" style="margin-left:8px;padding:2px 7px;font-size:0.72rem" data-action="delete-comment" data-post-id="${escapeHtml(post.id)}" data-comment-id="${escapeHtml(comment.id)}">Delete</button>` : ''}
+            </div>
             <div class="text">${escapeHtml(comment.text)}</div>
           </div>
         `).join('');
@@ -194,7 +198,10 @@
           <article class="feed-card" data-post-id="${escapeHtml(post.id)}">
             <div class="feed-head">
               <div class="feed-author">${escapeHtml(post.author_display_name || post.author_username)}<span class="verified-badge" title="Admin">✓</span></div>
-              <div class="feed-date">${escapeHtml(formatDate(post.created_at))}</div>
+              <div class="feed-date">
+                ${escapeHtml(formatDate(post.created_at))}
+                ${isAdmin ? `<button class="btn-sm demote" style="margin-left:8px" data-action="delete-post" data-post-id="${escapeHtml(post.id)}">Delete Post</button>` : ''}
+              </div>
             </div>
             <div class="feed-content">${escapeHtml(post.content)}</div>
             <div class="feed-actions">
@@ -286,6 +293,46 @@
     });
 
     feedList.addEventListener('click', async (event) => {
+      // Delete post
+      const deletePostBtn = event.target.closest('[data-action="delete-post"]');
+      if (deletePostBtn) {
+        const postId = deletePostBtn.getAttribute('data-post-id');
+        if (!confirm('Delete this post?')) return;
+        deletePostBtn.disabled = true;
+        try {
+          const res = await fetch(`/api/posts/${postId}`, { method: 'DELETE', credentials: 'same-origin' });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Delete failed');
+          feedPosts = feedPosts.filter((p) => String(p.id) !== String(postId));
+          renderFeed();
+        } catch (err) {
+          alert(err.message || 'Delete failed');
+          deletePostBtn.disabled = false;
+        }
+        return;
+      }
+
+      // Delete comment
+      const deleteCommentBtn = event.target.closest('[data-action="delete-comment"]');
+      if (deleteCommentBtn) {
+        const postId = deleteCommentBtn.getAttribute('data-post-id');
+        const commentId = deleteCommentBtn.getAttribute('data-comment-id');
+        if (!confirm('Delete this comment?')) return;
+        deleteCommentBtn.disabled = true;
+        try {
+          const res = await fetch(`/api/posts/${postId}/comments/${commentId}`, { method: 'DELETE', credentials: 'same-origin' });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Delete failed');
+          feedPosts = feedPosts.map((p) => (String(p.id) === String(postId) ? data.post : p));
+          renderFeed();
+        } catch (err) {
+          alert(err.message || 'Delete failed');
+          deleteCommentBtn.disabled = false;
+        }
+        return;
+      }
+
+      // Like
       const likeButton = event.target.closest('[data-action="like"]');
       if (!likeButton) return;
       const postId = likeButton.getAttribute('data-post-id');

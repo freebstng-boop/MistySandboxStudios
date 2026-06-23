@@ -338,6 +338,42 @@ async function addPostComment({ post_id, user_id, username, display_name, text }
   return store.posts[idx];
 }
 
+async function deletePost(postId) {
+  if (Post) {
+    const doc = await Post.findByIdAndDelete(postId);
+    return !!doc;
+  }
+
+  const store = readStore();
+  const idx = store.posts.findIndex((p) => String(p.id) === String(postId));
+  if (idx === -1) return false;
+  store.posts.splice(idx, 1);
+  writeStore(store);
+  return true;
+}
+
+async function deleteComment(postId, commentId) {
+  if (Post) {
+    const doc = await Post.findById(postId);
+    if (!doc) return null;
+    const before = Array.isArray(doc.comments) ? doc.comments.length : 0;
+    doc.comments = (doc.comments || []).filter((c) => c.comment_id !== commentId);
+    if (doc.comments.length === before) return null;
+    await doc.save();
+    return mapMongoPost(doc.toObject());
+  }
+
+  const store = readStore();
+  const idx = store.posts.findIndex((p) => String(p.id) === String(postId));
+  if (idx === -1) return null;
+  const comments = Array.isArray(store.posts[idx].comments) ? store.posts[idx].comments : [];
+  const before = comments.length;
+  store.posts[idx].comments = comments.filter((c) => String(c.id) !== String(commentId));
+  if (store.posts[idx].comments.length === before) return null;
+  writeStore(store);
+  return store.posts[idx];
+}
+
 module.exports = {
   initDatabase,
   createOrUpdateUser,
@@ -346,6 +382,8 @@ module.exports = {
   setUserRole,
   getFeedPosts,
   createFeedPost,
+  deletePost,
+  deleteComment,
   togglePostLike,
   addPostComment,
 };

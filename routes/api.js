@@ -7,6 +7,8 @@ const {
   setUserRole,
   getFeedPosts,
   createFeedPost,
+  deletePost,
+  deleteComment,
   togglePostLike,
   addPostComment,
 } = require('../db/database');
@@ -187,6 +189,28 @@ router.post('/posts/:postId/comments', requireAuth, async (req, res, next) => {
 
     if (!post) return res.status(404).json({ error: 'Post not found' });
     res.status(201).json({ post });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/posts/:postId — admin/owner delete a post
+router.delete('/posts/:postId', requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const deleted = await deletePost(req.params.postId);
+    if (!deleted) return res.status(404).json({ error: 'Post not found' });
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/posts/:postId/comments/:commentId — admin/owner delete a comment
+router.delete('/posts/:postId/comments/:commentId', requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const post = await deleteComment(req.params.postId, req.params.commentId);
+    if (!post) return res.status(404).json({ error: 'Post or comment not found' });
+    res.json({ post });
   } catch (err) {
     next(err);
   }
