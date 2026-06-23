@@ -12,6 +12,11 @@ const { initDatabase } = require('./db/database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Render/other PaaS terminate TLS at a proxy, so Express must trust it.
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Security middleware
 app.use(
   helmet({
@@ -50,6 +55,7 @@ const sessionOptions = {
   secret: process.env.SESSION_SECRET || 'change-this-secret',
   resave: false,
   saveUninitialized: false,
+  proxy: process.env.NODE_ENV === 'production',
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,

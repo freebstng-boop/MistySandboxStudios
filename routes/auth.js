@@ -34,7 +34,13 @@ router.get('/roblox', (req, res) => {
     state: state,
   });
 
-  res.redirect(`${ROBLOX_AUTH_URL}?${params.toString()}`);
+  req.session.save((err) => {
+    if (err) {
+      console.error('Session save error before OAuth redirect:', err);
+      return res.redirect('/login?error=auth_failed');
+    }
+    res.redirect(`${ROBLOX_AUTH_URL}?${params.toString()}`);
+  });
 });
 
 // --- Roblox OAuth Callback ---
