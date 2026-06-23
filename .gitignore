@@ -1,0 +1,6 @@
+node_modules/
+.env
+db/studio.db
+db/sessions.db
+*.db-shm
+*.db-wal

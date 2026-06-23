@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Misty Sandbox Studios</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <canvas id="mist-canvas" aria-hidden="true"></canvas>
+
+  <main class="auth-page" role="main">
+    <div class="auth-card" role="region" aria-label="Sign in">
+
+      <!-- Logo -->
+      <div class="auth-logo">
+        <div class="logo-icon" style="background:transparent;box-shadow:none;overflow:hidden;padding:0">
+          <img src="/cdn/MistySandboxStudiosLOGO.png" alt="" aria-hidden="true" style="width:100%;height:100%;object-fit:contain" />
+        </div>
+        <span>Misty Sandbox Studios</span>
+      </div>
+
+      <!-- Error alert (shown when ?error=... in URL) -->
+      <div class="alert alert-error" id="error-alert" style="display:none" role="alert" aria-live="polite">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" stroke="#fca5a5" stroke-width="2"/>
+          <path d="M12 8v4M12 16h.01" stroke="#fca5a5" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span id="error-message">Authentication failed. Please try again.</span>
+      </div>
+
+      <h1>Welcome back</h1>
+      <p class="auth-sub">
+        Sign in or create an account using your Roblox identity — no separate password needed.
+      </p>
+
+      <!-- Roblox OAuth button -->
+      <a href="/auth/roblox" class="btn btn-roblox" id="roblox-login-btn" aria-label="Continue with Roblox">
+        <img src="/cdn/BlueRobloxLogo.webp" alt="" aria-hidden="true" style="width:22px;height:22px;object-fit:contain" />
+        Continue with Roblox
+      </a>
+
+      <div class="auth-divider">or</div>
+
+      <p style="font-size:0.88rem; color:var(--text-muted); line-height:1.7;">
+        New to Misty Sandbox Studios? Using the button above will automatically create your account the first time you sign in.
+      </p>
+
+      <p class="auth-note">
+        By continuing, you agree to our
+        <a href="/tos">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+        We only request your public Roblox profile information.
+      </p>
+
+      <a href="/" class="auth-back">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back to home
+      </a>
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script>
+    // Show error message from URL param
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const err = params.get('error');
+      if (!err) return;
+
+      const messages = {
+        invalid_state:   'Session expired or invalid request. Please try again.',
+        auth_failed:     'Authentication with Roblox failed. Please try again.',
+        access_denied:   'You cancelled the Roblox login.',
+        not_configured:  'Roblox login is not configured yet. Check server settings.',
+        invalid_request: 'Invalid request. Please try again.',
+      };
+
+      const alert = document.getElementById('error-alert');
+      const msg   = document.getElementById('error-message');
+      msg.textContent = messages[err] || 'An error occurred. Please try again.';
+      alert.style.display = 'flex';
+
+      // Clean the URL without reload
+      window.history.replaceState({}, '', '/login');
+    })();
+  </script>
+</body>
+</html>

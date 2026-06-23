@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Misty Sandbox Studios — Roblox Game Development</title>
+  <meta name="description" content="Misty Sandbox Studios crafts immersive Roblox experiences. Join our community today." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <canvas id="mist-canvas" aria-hidden="true"></canvas>
+
+  <!-- ── Navigation ── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo" aria-label="Misty Sandbox Studios Home">
+        <div class="logo-icon" style="background:transparent;box-shadow:none;overflow:hidden;padding:0">
+          <img src="/cdn/MistySandboxStudiosLOGO.png" alt="" aria-hidden="true" style="width:100%;height:100%;object-fit:contain" />
+        </div>
+        <span>Misty Sandbox Studios</span>
+      </a>
+
+      <ul class="nav-links" role="navigation" aria-label="Main navigation">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#games">Games</a></li>
+        <li><a href="#join">Community</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="/login" class="btn btn-primary">Login</a>
+      </div>
+
+      <button class="hamburger" aria-label="Open menu" aria-expanded="false" id="hamburger-btn">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile menu overlay -->
+  <div class="mobile-menu" id="mobile-menu" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <button class="mobile-close" id="mobile-close-btn" aria-label="Close menu">&times;</button>
+    <a href="#home"  onclick="closeMobileMenu()">Home</a>
+    <a href="#about" onclick="closeMobileMenu()">About</a>
+    <a href="#games" onclick="closeMobileMenu()">Games</a>
+    <a href="#join"  onclick="closeMobileMenu()">Community</a>
+    <a href="/login" class="btn btn-primary btn-large">Login / Sign Up</a>
+  </div>
+
+  <!-- ── Hero ── -->
+  <section id="home" class="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge">Welcome to the Studio</div>
+        <h1 class="hero-title">
+          <span class="gradient-text">Misty</span> Sandbox<br>Studios
+        </h1>
+        <p class="hero-subtitle">
+          We craft immersive, story-driven Roblox experiences where every fog-covered world hides something worth discovering.
+        </p>
+        <div class="hero-actions">
+          <a href="/login" class="btn btn-primary btn-large">Join the Studio</a>
+          <a href="#games" class="btn btn-outline btn-large">Explore Games</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat">
+            <div class="stat-value">50K+</div>
+            <div class="stat-label">Players</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <div class="stat-value">10+</div>
+            <div class="stat-label">Experiences</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <div class="stat-value">5★</div>
+            <div class="stat-label">Rating</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <div class="hero-orb">
+          <div class="orb-ring"></div>
+          <div class="orb-ring"></div>
+          <div class="orb-ring"></div>
+          <div class="orb-core"></div>
+          <div class="orb-logo">MSS</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About ── -->
+  <section id="about" class="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text">
+          <span class="section-tag">Our Story</span>
+          <h2 class="section-title">Built by creators,<br><span class="gradient-text">for players</span></h2>
+          <p class="section-desc">
+            Misty Sandbox Studios was founded with one goal: to push the boundaries of what Roblox can be. Every game we ship is hand-crafted with attention to atmosphere, mechanics, and community.
+          </p>
+          <div class="about-features">
+            <div class="feature-item">
+              <div class="feature-icon">🎮</div>
+              <div class="feature-text">
+                <h4>Immersive Gameplay</h4>
+                <p>Every experience is designed around deep mechanics and rich worlds that keep players coming back.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🌫️</div>
+              <div class="feature-text">
+                <h4>Atmospheric Design</h4>
+                <p>Our signature misty aesthetic creates unforgettable moods across every title we release.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">🤝</div>
+              <div class="feature-text">
+                <h4>Community First</h4>
+                <p>Player feedback drives every update. We listen, iterate, and deliver what our community wants.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-image-wrap">
+          <div class="about-panel glass-card">
+            <div class="about-panel-icon">🏗️</div>
+            <h3>Active Development</h3>
+            <p>Our team ships regular updates, seasonal events, and brand-new games throughout the year. There's always something new on the horizon.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Games ── -->
+  <section id="games" class="games">
+    <div class="container">
+      <div class="games-header">
+        <span class="section-tag">Portfolio</span>
+        <h2 class="section-title">Our Experiences</h2>
+        <p class="section-desc">From mystery adventures to sandbox worlds, we build the games we love to play.</p>
+      </div>
+
+      <div class="games-grid" style="grid-template-columns:minmax(0,480px);justify-content:center">
+        <div class="game-card">
+          <div class="game-banner" style="height:200px;background:#08080f;padding:0;overflow:hidden">
+            <img src="/cdn/VNPLogo.webp" alt="Vorago Nuclear Plant" style="width:100%;height:100%;object-fit:cover" />
+          </div>
+          <div class="game-info">
+            <div class="game-title">Vorago Nuclear Plant</div>
+            <div class="game-desc">Welcome to the City of Vorago, home of the amazing Vorago Nuclear Plant! Join the staff and maintain smooth operations, or become an infiltrator and destroy the operations forever.. who will succeed? Join to find out.</div>
+            <div class="game-meta">
+              <span class="game-status status-soon"><span class="status-dot"></span> Coming Soon</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Join ── -->
+  <section id="join" class="join-section">
+    <div class="container">
+      <div class="join-card">
+        <span class="section-tag">Community</span>
+        <h2 class="section-title">Ready to enter<br><span class="gradient-text">the mist?</span></h2>
+        <p class="section-desc">
+          Create your account with Roblox to unlock member perks, exclusive news, and early access to upcoming games.
+        </p>
+        <div class="join-actions">
+          <a href="/login" class="btn btn-primary btn-large">Login with Roblox</a>
+          <a href="#games" class="btn btn-outline btn-large">Browse Games</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="nav-logo" style="margin-bottom:16px">
+            <div class="logo-icon" style="width:32px;height:32px;border-radius:8px;background:transparent;box-shadow:none;overflow:hidden;padding:0">
+              <img src="/cdn/MistySandboxStudiosLOGO.png" alt="" aria-hidden="true" style="width:100%;height:100%;object-fit:contain" />
+            </div>
+            <span style="font-size:0.95rem">Misty Sandbox Studios</span>
+          </div>
+          <p>Crafting immersive Roblox experiences since day one. We build worlds worth getting lost in.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigate</h4>
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#games">Games</a></li>
+            <li><a href="#join">Community</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Account</h4>
+          <ul>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/login">Sign Up</a></li>
+            <li><a href="/dashboard">Dashboard</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="/tos">Terms of Service</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Misty Sandbox Studios. All rights reserved. Not affiliated with Roblox Corporation.</p>
+        <p style="display:flex;gap:20px">
+          <a href="/tos" style="color:var(--text-dim);transition:color 0.25s ease" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-dim)'">Terms of Service</a>
+          <a href="/privacy" style="color:var(--text-dim);transition:color 0.25s ease" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-dim)'">Privacy Policy</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

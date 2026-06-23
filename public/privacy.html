@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Misty Sandbox Studios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .legal-page { min-height: 100vh; padding: 120px 0 80px; position: relative; z-index: 1; }
+    .legal-header { margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border-subtle); }
+    .legal-header .section-tag { display: block; margin-bottom: 12px; }
+    .legal-header h1 { font-family: 'Orbitron', monospace; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 900; margin-bottom: 16px; }
+    .legal-header .meta { font-size: 0.88rem; color: var(--text-dim); }
+    .legal-body { max-width: 780px; }
+    .legal-body h2 { font-size: 1.15rem; font-weight: 700; margin: 40px 0 14px; color: var(--text); padding-left: 14px; border-left: 3px solid var(--cyan); }
+    .legal-body h3 { font-size: 1rem; font-weight: 600; margin: 24px 0 10px; color: var(--text-muted); }
+    .legal-body p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 14px; }
+    .legal-body ul { margin: 0 0 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+    .legal-body ul li { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; list-style: disc; }
+    .legal-body a { color: var(--cyan-light); text-decoration: underline; text-underline-offset: 3px; }
+    .legal-body a:hover { opacity: 0.8; }
+    .legal-callout { background: rgba(6, 182, 212, 0.06); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: var(--radius-md); padding: 20px 24px; margin: 32px 0; }
+    .legal-callout p { margin: 0; font-size: 0.9rem; }
+    .legal-nav { display: flex; align-items: center; gap: 24px; margin-bottom: 48px; font-size: 0.88rem; flex-wrap: wrap; }
+    .legal-nav a { color: var(--text-dim); transition: color var(--transition); }
+    .legal-nav a:hover { color: var(--text); }
+    .legal-nav .sep { color: var(--text-dim); }
+    .data-table { width: 100%; border-collapse: collapse; margin: 20px 0 28px; font-size: 0.88rem; }
+    .data-table th { text-align: left; padding: 10px 14px; background: rgba(255,255,255,0.04); color: var(--text-muted); font-weight: 600; border: 1px solid var(--border-subtle); }
+    .data-table td { padding: 10px 14px; color: var(--text-muted); border: 1px solid var(--border-subtle); line-height: 1.6; vertical-align: top; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+  </style>
+</head>
+<body>
+  <canvas id="mist-canvas" aria-hidden="true"></canvas>
+
+  <!-- Minimal nav -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo" aria-label="Misty Sandbox Studios Home">
+        <div class="logo-icon" style="background:transparent;box-shadow:none;overflow:hidden;padding:0">
+          <img src="/cdn/MistySandboxStudiosLOGO.png" alt="" aria-hidden="true" style="width:100%;height:100%;object-fit:contain" />
+        </div>
+        <span>Misty Sandbox Studios</span>
+      </a>
+      <div class="nav-actions" style="margin-left:auto">
+        <a href="/" class="btn btn-outline">← Back to Home</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="legal-page" role="main">
+    <div class="container">
+
+      <nav class="legal-nav" aria-label="Legal pages">
+        <a href="/">Home</a>
+        <span class="sep">/</span>
+        <strong style="color:var(--text)">Privacy Policy</strong>
+        <span class="sep">·</span>
+        <a href="/tos">Terms of Service</a>
+      </nav>
+
+      <div class="legal-header">
+        <span class="section-tag">Legal</span>
+        <h1>Privacy <span class="gradient-text">Policy</span></h1>
+        <p class="meta">Last updated: June 23, 2026 &nbsp;·&nbsp; Effective: June 23, 2026</p>
+      </div>
+
+      <div class="legal-body">
+
+        <div class="legal-callout">
+          <p>Your privacy matters to us. This Privacy Policy explains what information we collect when you use the Misty Sandbox Studios website, how we use it, and your rights regarding that data.</p>
+        </div>
+
+        <h2>1. Who We Are</h2>
+        <p>Misty Sandbox Studios ("we", "us", "our") is an independent Roblox game development studio. This Privacy Policy applies to our website and associated member portal. We are not affiliated with Roblox Corporation.</p>
+
+        <h2>2. Information We Collect</h2>
+        <p>We collect only the minimum information necessary to operate the Service. When you sign in via Roblox OAuth, we receive and store the following from your public Roblox profile:</p>
+
+        <table class="data-table" role="table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Source</th>
+              <th>Why We Collect It</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Roblox User ID</td>
+              <td>Roblox OAuth</td>
+              <td>Unique identifier to link your account across sessions</td>
+            </tr>
+            <tr>
+              <td>Username</td>
+              <td>Roblox OAuth</td>
+              <td>Display your identity on the dashboard and in the community</td>
+            </tr>
+            <tr>
+              <td>Display Name</td>
+              <td>Roblox OAuth</td>
+              <td>Personalize your welcome message and profile</td>
+            </tr>
+            <tr>
+              <td>Profile Picture URL</td>
+              <td>Roblox OAuth</td>
+              <td>Show your Roblox avatar on your profile</td>
+            </tr>
+            <tr>
+              <td>Account role</td>
+              <td>Our system</td>
+              <td>Manage member permissions (default: "member")</td>
+            </tr>
+            <tr>
+              <td>Join date &amp; last login</td>
+              <td>Our system</td>
+              <td>Display membership history on your dashboard</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>2.1 Session Data</h3>
+        <p>When you are logged in, we store a session cookie in your browser that identifies your session on our server. This cookie contains no personal information — it is a random identifier only. Sessions expire after 7 days of inactivity.</p>
+
+        <h3>2.2 Server Logs</h3>
+        <p>Like most web servers, ours may automatically log standard technical information such as IP addresses, browser type, pages visited, and timestamps. These logs are used only for debugging and security purposes and are not sold or shared.</p>
+
+        <h3>2.3 What We Do NOT Collect</h3>
+        <ul>
+          <li>Passwords (we never see your Roblox password)</li>
+          <li>Email addresses</li>
+          <li>Payment information</li>
+          <li>Location data beyond what is in server logs</li>
+          <li>Any private Roblox account data (messages, inventory, friends list, etc.)</li>
+        </ul>
+
+        <h2>3. How We Use Your Information</h2>
+        <p>We use the information we collect solely to:</p>
+        <ul>
+          <li>Authenticate you and maintain your login session</li>
+          <li>Display your profile on your dashboard</li>
+          <li>Identify you within our community system</li>
+          <li>Improve the security and functionality of the Service</li>
+        </ul>
+        <p>We do <strong>not</strong> sell, rent, or share your personal data with any third parties for marketing or advertising purposes.</p>
+
+        <h2>4. Data Storage &amp; Security</h2>
+        <p>Your data is stored in a local JSON file on our server. We take reasonable technical precautions to protect your data, including:</p>
+        <ul>
+          <li>HTTPS encryption for all data in transit (when deployed to production)</li>
+          <li>HTTP-only session cookies to prevent client-side script access</li>
+          <li>CSRF state verification on all OAuth flows</li>
+          <li>No storage of sensitive credentials or tokens beyond the OAuth session</li>
+        </ul>
+        <p>No method of transmission or storage is 100% secure. While we strive to protect your data, we cannot guarantee absolute security.</p>
+
+        <h2>5. Roblox OAuth &amp; Third Parties</h2>
+        <p>Authentication is handled by Roblox's OAuth 2.0 service. When you click "Continue with Roblox," you are directed to Roblox's authorization page — we never see your Roblox password. The scopes we request are limited to <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.85em">openid</code> and <code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.85em">profile</code>, which provide only your public identity information.</p>
+        <p>Roblox's handling of your data during authentication is governed by <a href="https://en.help.roblox.com/hc/en-us/articles/115004630823" target="_blank" rel="noopener noreferrer">Roblox's Privacy Policy</a>.</p>
+
+        <h2>6. Cookies</h2>
+        <p>We use a single session cookie (<code style="background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px;font-size:0.85em">connect.sid</code>) to maintain your login state. This cookie is:</p>
+        <ul>
+          <li><strong>HTTP-only</strong> — not accessible via JavaScript</li>
+          <li><strong>SameSite: Lax</strong> — not sent on cross-site requests</li>
+          <li><strong>Session-scoped</strong> — expires 7 days after your last login</li>
+        </ul>
+        <p>We do not use tracking cookies, advertising cookies, or analytics cookies.</p>
+
+        <h2>7. Data Retention</h2>
+        <p>We retain your account data for as long as your account is active. You may request deletion of your account and all associated data at any time by contacting us. Upon deletion, your entry is permanently removed from our database.</p>
+
+        <h2>8. Children's Privacy</h2>
+        <p>Our Service is intended for users who meet Roblox's age requirements. We do not knowingly collect personal information from children under 13. If we become aware that a child under 13 has provided us with personal information, we will delete it promptly. If you believe this has occurred, please contact us.</p>
+
+        <h2>9. Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+          <li><strong>Access</strong> — request a copy of the data we hold about you</li>
+          <li><strong>Correction</strong> — request correction of inaccurate data (note: your Roblox username/display name updates automatically on next login)</li>
+          <li><strong>Deletion</strong> — request permanent deletion of your account and all associated data</li>
+          <li><strong>Opt out</strong> — simply stop using the Service at any time</li>
+        </ul>
+        <p>To exercise any of these rights, please contact us through our community channels or Roblox group page.</p>
+
+        <h2>10. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. We will post the revised policy on this page with an updated "Last updated" date. Continued use of the Service after changes constitutes acceptance of the updated policy.</p>
+
+        <h2>11. Contact</h2>
+        <p>If you have any questions, concerns, or requests regarding this Privacy Policy, please reach out through our Roblox group page or community channels.</p>
+
+        <div class="legal-callout" style="margin-top:48px">
+          <p>This Privacy Policy should be read alongside our <a href="/tos">Terms of Service</a>.</p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom" style="border-top:none; padding-top:0">
+        <p>&copy; 2026 Misty Sandbox Studios. All rights reserved.</p>
+        <p style="display:flex;gap:20px">
+          <a href="/tos" style="color:var(--text-dim);transition:color 0.25s ease" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-dim)'">Terms of Service</a>
+          <a href="/privacy" style="color:var(--text-dim);transition:color 0.25s ease" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-dim)'">Privacy Policy</a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

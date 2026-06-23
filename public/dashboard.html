@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Misty Sandbox Studios</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="dashboard-page">
+  <canvas id="mist-canvas" aria-hidden="true"></canvas>
+
+  <!-- ── Dashboard Nav ── -->
+  <nav class="dashboard-nav" role="navigation" aria-label="Dashboard navigation">
+    <div class="nav-container">
+      <a href="/" class="nav-logo" aria-label="Home">
+        <div class="logo-icon" style="background:transparent;box-shadow:none;overflow:hidden;padding:0">
+          <img src="/cdn/MistySandboxStudiosLOGO.png" alt="" aria-hidden="true" style="width:100%;height:100%;object-fit:contain" />
+        </div>
+        <span>Misty Sandbox Studios</span>
+      </a>
+
+      <!-- User pill — populated by JS -->
+      <div class="user-pill" id="user-pill" aria-label="Your profile">
+        <div class="user-avatar" id="nav-avatar" aria-hidden="true">?</div>
+        <span class="user-name" id="nav-username">Loading…</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Main Content ── -->
+  <main class="dash-main" id="dash-content" role="main">
+
+    <!-- Welcome -->
+    <div class="dash-welcome">
+      <h1>Welcome back, <span id="welcome-name" class="gradient-text">Explorer</span> 👋</h1>
+      <p>Here's what's happening at Misty Sandbox Studios.</p>
+    </div>
+
+    <!-- Stats row -->
+    <div class="dash-stats" role="list">
+      <div class="stat-card" role="listitem">
+        <div class="stat-icon purple">🎮</div>
+        <div class="stat-number">3</div>
+        <div class="stat-label">Active Games</div>
+      </div>
+      <div class="stat-card" role="listitem">
+        <div class="stat-icon cyan">👥</div>
+        <div class="stat-number">50K+</div>
+        <div class="stat-label">Community Members</div>
+      </div>
+      <div class="stat-card" role="listitem">
+        <div class="stat-icon green">🟢</div>
+        <div class="stat-number">2</div>
+        <div class="stat-label">Live Servers</div>
+      </div>
+      <div class="stat-card" role="listitem">
+        <div class="stat-icon amber">📣</div>
+        <div class="stat-number">3</div>
+        <div class="stat-label">News Updates</div>
+      </div>
+    </div>
+
+    <!-- Main panels -->
+    <div class="dash-grid">
+
+      <!-- News feed -->
+      <div class="dash-panel" role="feed" aria-label="Studio news">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2z" stroke="var(--purple-light)" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M9 14h6M9 10h4" stroke="var(--purple-light)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Studio News
+        </h3>
+
+        <article class="news-item">
+          <div class="news-icon">🚀</div>
+          <div class="news-content">
+            <h4>Project: Veil — First Screenshots Revealed</h4>
+            <p>Get your first look at our upcoming action RPG. The atmosphere is unlike anything we've built before.</p>
+            <div class="news-date">June 20, 2026</div>
+          </div>
+        </article>
+
+        <article class="news-item">
+          <div class="news-icon">🔧</div>
+          <div class="news-content">
+            <h4>Misty Hollow v2.4 Update</h4>
+            <p>New fog mechanics, a revamped inn district, and over 30 bug fixes are live now. Check the patch notes!</p>
+            <div class="news-date">June 14, 2026</div>
+          </div>
+        </article>
+
+        <article class="news-item">
+          <div class="news-icon">🎉</div>
+          <div class="news-content">
+            <h4>50,000 Players Milestone!</h4>
+            <p>We hit 50K total visits across all our games. Thank you to every single player — this is for you.</p>
+            <div class="news-date">June 5, 2026</div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Profile panel -->
+      <div class="dash-panel profile-card" role="region" aria-label="Your profile">
+        <h3 style="justify-content:center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="8" r="4" stroke="var(--purple-light)" stroke-width="2"/>
+            <path d="M6 20v-1a6 6 0 0112 0v1" stroke="var(--purple-light)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Your Profile
+        </h3>
+
+        <div class="profile-avatar-wrap" id="profile-avatar-wrap" aria-hidden="true">
+          <span id="profile-avatar-initials">?</span>
+        </div>
+
+        <div class="profile-name" id="profile-display-name">Loading…</div>
+        <div class="profile-username" id="profile-username">@loading</div>
+
+        <div style="margin:12px 0">
+          <span class="role-badge" id="profile-role">member</span>
+        </div>
+
+        <div class="profile-meta" id="profile-meta">
+          Joined: —<br>
+          Last seen: —
+        </div>
+
+        <button class="logout-btn" id="logout-btn" aria-label="Log out">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Log Out
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script>
+    // Load user info and populate dashboard
+    (async function () {
+      try {
+        const res  = await fetch('/api/user', { credentials: 'same-origin' });
+        if (!res.ok) {
+          window.location.href = '/login';
+          return;
+        }
+        const { user } = await res.json();
+
+        // Nav
+        document.getElementById('nav-username').textContent = user.display_name || user.username;
+        const navAvatar = document.getElementById('nav-avatar');
+        if (user.avatar_url) {
+          const img = document.createElement('img');
+          img.src = user.avatar_url;
+          img.alt = user.display_name || user.username;
+          navAvatar.textContent = '';
+          navAvatar.appendChild(img);
+        } else {
+          navAvatar.textContent = (user.display_name || user.username).charAt(0).toUpperCase();
+        }
+
+        // Welcome
+        document.getElementById('welcome-name').textContent = user.display_name || user.username;
+        document.title = `Dashboard — ${user.display_name || user.username} | Misty Sandbox Studios`;
+
+        // Profile card
+        document.getElementById('profile-display-name').textContent = user.display_name || user.username;
+        document.getElementById('profile-username').textContent      = '@' + user.username;
+        document.getElementById('profile-role').textContent          = user.role || 'member';
+
+        const avatarWrap = document.getElementById('profile-avatar-wrap');
+        const initials   = document.getElementById('profile-avatar-initials');
+        if (user.avatar_url) {
+          const img = document.createElement('img');
+          img.src = user.avatar_url;
+          img.alt = user.display_name || user.username;
+          initials.replaceWith(img);
+        } else {
+          initials.textContent = (user.display_name || user.username).charAt(0).toUpperCase();
+        }
+
+        // Dates
+        const created   = user.created_at   ? new Date(user.created_at).toLocaleDateString()   : 'Unknown';
+        const lastLogin = user.last_login    ? new Date(user.last_login).toLocaleDateString()   : 'Unknown';
+        document.getElementById('profile-meta').innerHTML =
+          `Joined: ${created}<br>Last seen: ${lastLogin}`;
+
+      } catch (e) {
+        console.error('Dashboard load error:', e);
+        window.location.href = '/login';
+      }
+    })();
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', async function () {
+      this.disabled = true;
+      this.textContent = 'Logging out…';
+      try {
+        await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' });
+      } finally {
+        window.location.href = '/';
+      }
+    });
+  </script>
+</body>
+</html>
