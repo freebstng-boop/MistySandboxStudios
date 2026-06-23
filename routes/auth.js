@@ -8,6 +8,13 @@ const ROBLOX_AUTH_URL = 'https://apis.roblox.com/oauth/v1/authorize';
 const ROBLOX_TOKEN_URL = 'https://apis.roblox.com/oauth/v1/token';
 const ROBLOX_USERINFO_URL = 'https://apis.roblox.com/oauth/v1/userinfo';
 
+function getBaseUrl(req) {
+  const configured = (process.env.BASE_URL || '').trim().replace(/\/+$/, '');
+  if (configured) return configured;
+  const proto = req.get('x-forwarded-proto') || req.protocol;
+  return `${proto}://${req.get('host')}`;
+}
+
 // --- Initiate Roblox OAuth ---
 router.get('/roblox', (req, res) => {
   if (!process.env.ROBLOX_CLIENT_ID) {
@@ -17,10 +24,11 @@ router.get('/roblox', (req, res) => {
   // Generate cryptographically secure state for CSRF protection
   const state = crypto.randomBytes(32).toString('hex');
   req.session.oauthState = state;
+  const redirectUri = `${getBaseUrl(req)}/redirect`;
 
   const params = new URLSearchParams({
     client_id: process.env.ROBLOX_CLIENT_ID,
-    redirect_uri: `${process.env.BASE_URL}/redirect`,
+    redirect_uri: redirectUri,
     response_type: 'code',
     scope: 'openid profile',
     state: state,
@@ -32,6 +40,7 @@ router.get('/roblox', (req, res) => {
 // --- Roblox OAuth Callback ---
 router.get('/roblox/callback', async (req, res) => {
   const { code, state, error } = req.query;
+  const redirectUri = `${getBaseUrl(req)}/redirect`;
 
   // Handle user denial
   if (error) {
@@ -60,7 +69,7 @@ router.get('/roblox/callback', async (req, res) => {
         code: code,
         client_id: process.env.ROBLOX_CLIENT_ID,
         client_secret: process.env.ROBLOX_CLIENT_SECRET,
-        redirect_uri: `${process.env.BASE_URL}/redirect`,
+        redirect_uri: redirectUri,
       }).toString(),
       {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
