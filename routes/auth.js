@@ -20,7 +20,7 @@ router.get('/roblox', (req, res) => {
 
   const params = new URLSearchParams({
     client_id: process.env.ROBLOX_CLIENT_ID,
-    redirect_uri: `${process.env.BASE_URL}/auth/roblox/callback`,
+    redirect_uri: `${process.env.BASE_URL}/redirect`,
     response_type: 'code',
     scope: 'openid profile',
     state: state,
@@ -60,7 +60,7 @@ router.get('/roblox/callback', async (req, res) => {
         code: code,
         client_id: process.env.ROBLOX_CLIENT_ID,
         client_secret: process.env.ROBLOX_CLIENT_SECRET,
-        redirect_uri: `${process.env.BASE_URL}/auth/roblox/callback`,
+        redirect_uri: `${process.env.BASE_URL}/redirect`,
       }).toString(),
       {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

@@ -73,6 +73,12 @@ app.use('/cdn', express.static(path.join(__dirname, 'cdn')));
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 
+// Roblox OAuth redirect endpoint (matches the URI registered in Roblox Creator Hub)
+app.get('/redirect', (req, res) => {
+  const qs = new URLSearchParams(req.query).toString();
+  res.redirect(`/auth/roblox/callback?${qs}`);
+});
+
 // Serve specific HTML pages
 app.get('/login', (req, res) => {
   if (req.session.user) return res.redirect('/dashboard');
