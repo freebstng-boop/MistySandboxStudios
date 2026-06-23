@@ -15,6 +15,15 @@ function getBaseUrl(req) {
   return `${proto}://${req.get('host')}`;
 }
 
+// PKCE helpers — Roblox requires Proof Key for Code Exchange
+function generateCodeVerifier() {
+  return crypto.randomBytes(32).toString('base64url');
+}
+
+function generateCodeChallenge(verifier) {
+  return crypto.createHash('sha256').update(verifier).digest('base64url');
+}
+
 // --- Initiate Roblox OAuth ---
 router.get('/roblox', (req, res) => {
   if (!process.env.ROBLOX_CLIENT_ID) {
@@ -23,7 +32,11 @@ router.get('/roblox', (req, res) => {
 
   // Generate cryptographically secure state for CSRF protection
   const state = crypto.randomBytes(32).toString('hex');
+  const codeVerifier = generateCodeVerifier();
+  const codeChallenge = generateCodeChallenge(codeVerifier);
+
   req.session.oauthState = state;
+  req.session.codeVerifier = codeVerifier;
   const redirectUri = `${getBaseUrl(req)}/redirect`;
 
   const params = new URLSearchParams({
@@ -32,6 +45,8 @@ router.get('/roblox', (req, res) => {
     response_type: 'code',
     scope: 'openid profile',
     state: state,
+    code_challenge: codeChallenge,
+    code_challenge_method: 'S256',
   });
 
   req.session.save((err) => {
@@ -63,8 +78,15 @@ router.get('/roblox/callback', async (req, res) => {
     return res.redirect('/login?error=invalid_state');
   }
 
-  // Consume the state immediately
+  // Retrieve the PKCE code verifier stored during initiation
+  const codeVerifier = req.session.codeVerifier;
+  if (!codeVerifier) {
+    return res.redirect('/login?error=invalid_state');
+  }
+
+  // Consume the state and verifier immediately
   delete req.session.oauthState;
+  delete req.session.codeVerifier;
 
   try {
     // Exchange authorization code for access token
@@ -76,6 +98,7 @@ router.get('/roblox/callback', async (req, res) => {
         client_id: process.env.ROBLOX_CLIENT_ID,
         client_secret: process.env.ROBLOX_CLIENT_SECRET,
         redirect_uri: redirectUri,
+        code_verifier: codeVerifier,
       }).toString(),
       {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
